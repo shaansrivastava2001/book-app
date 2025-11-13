@@ -5,7 +5,7 @@ The book app built using the MERN stack (MongoDB, Express.js, React.js, Node.js)
 ## Architecture Overview
 
 The application consists of:
-- **Frontend**: React.js SPA running on `http://localhost:3000`
+- **Frontend**: React.js running on `http://localhost:3000`
 - **Backend Microservices**: Independent services running on separate ports:
   - **Users Service**: Handles user authentication and profiles (Port: `USERS_PORT`)
   - **Books Service**: Manages book listings and details (Port: `BOOKS_PORT`)
@@ -29,8 +29,8 @@ Before you begin, make sure you have the following prerequisites installed on yo
 2) Change to the directory where you want to clone the project.
 3) Run the following command:
    ```bash
-   git clone https://github.com/shsrivastava754/Book-App.git
-   cd Book-App
+   git clone https://github.com/shaansrivastava2001/book-app.git
+   cd book-App
    ```
 
 ### Step 2: Set up the Backend Microservices
