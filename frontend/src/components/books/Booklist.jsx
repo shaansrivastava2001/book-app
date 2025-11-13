@@ -2,8 +2,10 @@ import { useEffect, useState, React, useRef } from "react";
 import { Link } from "react-router-dom";
 
 import "../../styles/style.scss";
+
 import Header from "../common/Header";
 import Book from "./Book";
+import CustomSelect from "../common/CustomSelect";
 
 import BookService from "../../services/book.service";
 
@@ -151,11 +153,19 @@ const BookList = () => {
             placeholder="Search here..."
             onChange={searchBook}
           />
-          <select name="filterTable" id="filterTable" onChange={handleFilter} >
-            <option value="1">Available</option>
-            <option value="0">All Status</option>
-            <option value="2">Sold</option>
-          </select>
+          <CustomSelect
+            options={[
+              { label: "Available", value: "available" },
+              { label: "All Status", value: "" },
+              { label: "Sold", value: "sold" }
+            ]}
+            value={category}
+            onChange={(e) => {
+              setCategory(e.target.value);
+              setPage(1);
+            }}
+            placeholder="Filter by Status"
+          />
         </div>
         <div className="booksTable">
           <table>
@@ -184,16 +194,18 @@ const BookList = () => {
         <div className="pagination">
           <div className="left-pagination">
             <span htmlFor="rowsPerPage">Rows per page:</span>
-            <select
-              className="form-select"
-              onChange={(e) => handlePageSize(e)}
-              id="rowsPerPage"
-              style={{ display: "inline" }}
-            >
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
-            </select>
+            <CustomSelect
+              options={[
+                { label: "5", value: "5" },
+                { label: "10", value: "10" },
+                { label: "15", value: "15" }
+              ]}
+              value={rowsPerPage.toString()}
+              onChange={(e) => {
+                handlePageSize({ target: { value: e.target.value } });
+              }}
+              placeholder="Select rows"
+            />
           </div>
           <div className="right-pagination">
             <button

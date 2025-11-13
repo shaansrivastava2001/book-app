@@ -210,15 +210,24 @@ select {
 }
 
 .searchBar {
-  width: 50%;
+  width: 60%;
   background-color: $white;
   box-sizing: border-box;
-  margin-bottom: 20px;
+  margin-bottom: 0;
   padding: 10px;
   border-radius: 0.375rem;
   border: 2px solid #d6cfdb;
   color: $primary-color;
   font-weight: 700;
+  flex-grow: 1;
+}
+
+.components {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  align-items: center;
+  width: 100%;
 }
 
 .bookList h3 {
@@ -265,15 +274,79 @@ select {
   cursor: pointer;
 }
 
-#filterTable{
-  padding: 10px;
+#filterTable {
+  padding: 10px 15px;
   margin-left: 16.2rem;
   width: 30%;
-
+  border: 2px solid #d6cfdb;
+  border-radius: 0.375rem;
+  background-color: $white;
+  color: $primary-color;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236854c2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 20px;
+  padding-right: 40px;
 }
 
-.bookList option:hover {
-  background-color: $heading-color;
+#filterTable:hover {
+  border-color: $primary-color;
+  box-shadow: 0 4px 8px rgba(104, 84, 194, 0.15);
+}
+
+#filterTable:focus {
+  outline: none;
+  border-color: $primary-color;
+  box-shadow: 0 0 0 3px rgba(104, 84, 194, 0.1);
+}
+
+/* Custom dropdown styling */
+#filterTable option {
+  padding: 12px 15px;
+  margin: 5px 0;
+  background-color: $white;
+  color: $primary-color;
+  font-weight: 600;
+  border: none;
+  line-height: 1.8;
+  font-size: 16px;
+}
+
+#filterTable option:checked {
+  background: linear-gradient(#e8dff5, #e8dff5);
+  background-color: #e8dff5;
+  color: $primary-color;
+  font-weight: 700;
+}
+
+#filterTable option:hover {
+  background-color: #f0ebf8;
+  color: $primary-color;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+#filterTable::-webkit-scrollbar {
+  width: 8px;
+}
+
+#filterTable::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 0.375rem;
+}
+
+#filterTable::-webkit-scrollbar-thumb {
+  background: $primary-color;
+  border-radius: 4px;
+}
+
+#filterTable::-webkit-scrollbar-thumb:hover {
+  background: darken($primary-color, 10%);
 }
 
 .bookList #rowsPerPage {
@@ -659,7 +732,8 @@ footer {
   background-color: transparent;
   color: $primary-color;
   border: 1px solid $primary-color;
-  margin-left: auto;
+  padding: 8px 16px;
+  border-radius: 8px;
 }
 
 .btnPaginationControls:hover {
@@ -677,13 +751,17 @@ footer {
 
 .pagination ul {
   margin-bottom: 0;
+  display: flex;
+  gap: 5px;
+  align-items: center;
 }
 
 .right-pagination,
 .right-heading {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  gap: 10px;
 }
 
 .left-pagination,
