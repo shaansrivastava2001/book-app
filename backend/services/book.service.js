@@ -14,25 +14,33 @@ class BookService {
    * @returns {Integer} number of books
    */
   static async countBooks(searchQuery,category) {
-    let filterCondition;
+    try {
+      let filterCondition;
 
-    // Setting condition for select filter
-    if(category==="available"){
-      filterCondition = {quantity:{$gt:0}}
-    } else if (category==="sold"){
-      filterCondition = {quantity:0};
-    } else {
-      filterCondition = {};
-    }
+      // Setting condition for select filter
+      if (category === "available") {
+        filterCondition = { quantity: { $gt: 0 } };
+      } else if (category === "sold") {
+        filterCondition = { quantity: 0 };
+      } else {
+        filterCondition = {};
+      }
 
-    const books = await BookModel.find({
-      $or: [
-      { title: { $regex: searchQuery, $options: "i" } },
-      { author: { $regex: searchQuery, $options: "i" } },
-    ]
-    }).find(filterCondition).find({isDeleted: false});
+      const books = await BookModel.find({
+        $or: [
+          { title: { $regex: searchQuery, $options: "i" } },
+          { author: { $regex: searchQuery, $options: "i" } },
+        ],
+      })
+        .find(filterCondition)
+        .find({ isDeleted: false });
 
+      console.log(`BookService.countBooks - success count=${books.length}`);
       return books.length;
+    } catch (error) {
+      console.error(`BookService.countBooks - error`, error);
+      throw error;
+    }
   }
 
   /**
@@ -41,8 +49,14 @@ class BookService {
    * @returns {Object} a book with given title
    */
   static async findOneBook(title) {
-    const book = await BookModel.findOne({ title: title });
-    return book;
+    try {
+      const book = await BookModel.findOne({ title: title });
+      console.log(`BookService.findOneBook - success id=${book?._id}`);
+      return book;
+    } catch (error) {
+      console.error(`BookService.findOneBook - error title='${title}'`, error);
+      throw error;
+    }
   }
 
   /**
@@ -52,16 +66,21 @@ class BookService {
    * @returns {Object} updated book
    */
   static async updateQuantity(book, quantity) {
-    await BookModel.updateOne(
-      { title: book.title },
-      {
-        $set: {
-          quantity: quantity + book.quantity,
-        },
-      }
-    );
-
-    return book;
+    try {
+      await BookModel.updateOne(
+        { title: book.title },
+        {
+          $set: {
+            quantity: quantity + book.quantity,
+          },
+        }
+      );
+      console.log(`BookService.updateQuantity - success title='${book.title}'`);
+      return book;
+    } catch (error) {
+      console.error(`BookService.updateQuantity - error title='${book.title}'`, error);
+      throw error;
+    }
   }
 
   /**
@@ -70,15 +89,21 @@ class BookService {
    * @returns {Object} object of the new book
    */
   static async addBook(body) {
-    const user = await UserModel.findOne({ _id: body.donatedById });
-    body.status = "available";
-    body.isDeleted = false;
-    body.donatedById = user._id;
-    body.donatedByEmail = user.email;
-    const newBook = new BookModel(body);
+    try {
+      const user = await UserModel.findOne({ _id: body.donatedById });
+      body.status = "available";
+      body.isDeleted = false;
+      body.donatedById = user._id;
+      body.donatedByEmail = user.email;
+      const newBook = new BookModel(body);
 
-    await newBook.save();
-    return newBook;
+      await newBook.save();
+      console.log(`BookService.addBook - success bookId=${newBook._id}`);
+      return newBook;
+    } catch (error) {
+      console.error(`BookService.addBook - error donatedById=${body.donatedById}`, error);
+      throw error;
+    }
   }
 
   /**
@@ -87,8 +112,14 @@ class BookService {
    * @returns {Object} a book with given id
    */
   static async findBookById(id) {
-    const book = await BookModel.findById(id);
-    return book;
+    try {
+      const book = await BookModel.findById(id);
+      console.log(`BookService.findBookById - success id=${id}`);
+      return book;
+    } catch (error) {
+      console.error(`BookService.findBookById - error id=${id}`, error);
+      throw error;
+    }
   }
 
   /**
@@ -98,17 +129,23 @@ class BookService {
    * @returns {Object} updated book
    */
   static async updateBook(id, body) {
-    const book = await BookModel.findByIdAndUpdate(id, {
-      title: body.title,
-      author: body.author,
-      description: body.description,
-      sale_price: body.sale_price,
-      price: body.price,
-      quantity: body.quantity,
-    });
+    try {
+      const book = await BookModel.findByIdAndUpdate(id, {
+        title: body.title,
+        author: body.author,
+        description: body.description,
+        sale_price: body.sale_price,
+        price: body.price,
+        quantity: body.quantity,
+      });
 
-    book.save();
-    return book;
+      await book.save();
+      console.log(`BookService.updateBook - success id=${id}`);
+      return book;
+    } catch (error) {
+      console.error(`BookService.updateBook - error id=${id}`, error);
+      throw error;
+    }
   }
 
   /**
@@ -117,12 +154,18 @@ class BookService {
    * @returns {Object} message of the removed book
    */
   static async deleteBook(id) {
-    const book = await BookModel.findByIdAndUpdate(id, {
-      isDeleted: true,
-    });
+    try {
+      const book = await BookModel.findByIdAndUpdate(id, {
+        isDeleted: true,
+      });
 
-    book.save();
-    return book;
+      await book.save();
+      console.log(`BookService.deleteBook - success id=${id}`);
+      return book;
+    } catch (error) {
+      console.error(`BookService.deleteBook - error id=${id}`, error);
+      throw error;
+    }
   }
 
   /**
@@ -132,29 +175,37 @@ class BookService {
    * @returns {Array} filtered books
    */
   static async getBooks(skip, limit, searchQuery,category) {
-    let books,filterCondition;
+    try {
+      let books, filterCondition;
 
-    // Setting condition for select filter
-    if(category==="available"){
-      filterCondition = {quantity:{$gt:0}}
-    } else if (category==="sold"){
-      filterCondition = {quantity:0};
-    } else {
-      filterCondition = {};
-    }
+      // Setting condition for select filter
+      if (category === "available") {
+        filterCondition = { quantity: { $gt: 0 } };
+      } else if (category === "sold") {
+        filterCondition = { quantity: 0 };
+      } else {
+        filterCondition = {};
+      }
 
-    books = await BookModel.find({
-      // donatedById: { $ne: userId },
-      isDeleted: false,
-      $or: [
-        { title: { $regex: searchQuery, $options: "i" } },
-        { author: { $regex: searchQuery, $options: "i" } },
-      ]
-    }).find(filterCondition)
-      .sort({ _id: -1 }).skip(skip).limit(limit);
-      
-    
+      books = await BookModel.find({
+        // donatedById: { $ne: userId },
+        isDeleted: false,
+        $or: [
+          { title: { $regex: searchQuery, $options: "i" } },
+          { author: { $regex: searchQuery, $options: "i" } },
+        ],
+      })
+        .find(filterCondition)
+        .sort({ _id: -1 })
+        .skip(skip)
+        .limit(limit);
+
+      console.log(`BookService.getBooks - success returned=${books.length}`);
       return books;
+    } catch (error) {
+      console.error(`BookService.getBooks - error`, error);
+      throw error;
+    }
   }
 
   /**
@@ -163,19 +214,25 @@ class BookService {
    * @param {Number} quantity
    */
   static async updateQuantities(bookId, quantity) {
-    const book = await BookModel.findOne({ _id: bookId });
-    let updatedBook;
-    if(book.quantity==quantity){
-      updatedBook = await BookModel.findByIdAndUpdate(bookId,{
-        quantity: 0
-      });
-    } else {
-      updatedBook = await BookModel.findByIdAndUpdate(bookId, {
-        quantity: book.quantity - quantity,
-      });
-    }
+    try {
+      const book = await BookModel.findOne({ _id: bookId });
+      let updatedBook;
+      if (book.quantity == quantity) {
+        updatedBook = await BookModel.findByIdAndUpdate(bookId, {
+          quantity: 0,
+        });
+      } else {
+        updatedBook = await BookModel.findByIdAndUpdate(bookId, {
+          quantity: book.quantity - quantity,
+        });
+      }
 
-    updatedBook.save();
+      await updatedBook.save();
+      console.log(`BookService.updateQuantities - success bookId=${bookId}`);
+    } catch (error) {
+      console.error(`BookService.updateQuantities - error bookId=${bookId}`, error);
+      throw error;
+    }
   }
 
   /**
@@ -184,25 +241,26 @@ class BookService {
    * @returns a status message
    */
   static async requestBook(body) {
-    const user = await UserService.findUserById(body.userId);
-    const bookName = body.bookName;
-    const author = body.author;
+    try {
+      const user = await UserService.findUserById(body.userId);
+      const bookName = body.bookName;
+      const author = body.author;
 
-    const userEmail = process.env.EMAIL;
-    const subject = `Someone requested a book`;
-    const name = 'Admin';
+      const userEmail = process.env.EMAIL;
+      const subject = `Someone requested a book`;
+      const name = "Admin";
 
-    // Table template that is rendered inside the html content
-    const tableTemplate = `
+      // Table template that is rendered inside the html content
+      const tableTemplate = `
         <tr>
           <td>${bookName}</td>
           <td>${author}</td>
         </tr>
     `;
 
-    const style = EmailStyle.returnStyle();
+      const style = EmailStyle.returnStyle();
 
-    const html = `
+      const html = `
     <head>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -241,12 +299,17 @@ class BookService {
               <span class="text-muted">© 2023 Book App. All rights reserved.</span>
           </div>
       </footer>
-    </body>`
+    </body>`;
 
-    const emailObj = { userEmail, subject, html, name};
+      const emailObj = { userEmail, subject, html, name };
 
-    const result = await EmailService.sendEmail(emailObj);
-    return result;
+      const result = await EmailService.sendEmail(emailObj);
+      console.log(`BookService.requestBook - success userId=${body.userId}`);
+      return result;
+    } catch (error) {
+      console.error(`BookService.requestBook - error userId=${body.userId}`, error);
+      throw error;
+    }
   }
 }
 

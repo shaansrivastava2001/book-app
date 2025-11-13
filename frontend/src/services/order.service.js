@@ -1,6 +1,8 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
+const orderServiceUrl = `${process.env.REACT_APP_ORDER_MS_URL}/orders`;
+
 /**
  * Utility class for handling book services
  */
@@ -11,8 +13,8 @@ class OrderService{
  * @param {ObjectId} id
  * @returns
  */
-  async getBooks (id) {
-    const url = `${process.env.REACT_APP_API_URL}/orders/${id}`
+  async getBooksInOrder (id) {
+    const url = `${orderServiceUrl}/getBooksInOrder/${id}`
     let response = await axios.get(url,{
       params: {
         token: Cookies.get('token')

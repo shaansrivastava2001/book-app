@@ -31,7 +31,7 @@ const Book = (props) => {
   useEffect(() => {
     compareBook();
     (async ()=>{
-      const response = await UserService.getUser(url);
+      const response = await UserService.getUser(props.book.donatedById);
       setUser(response.data.message);
     })();
   },[disabled]);
@@ -40,7 +40,6 @@ const Book = (props) => {
   
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  const url = `${process.env.REACT_APP_API_URL}/users/${props.book.donatedById}`;
 
   /**
    * Tooltip for add to cart button

@@ -2,16 +2,21 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 
+const userServiceUrl = `${process.env.REACT_APP_USER_MS_URL}/users`;
+const orderServiceUrl = `${process.env.REACT_APP_ORDER_MS_URL}/orders`;
+
 /**
  * Utility class for handling User Services
  */
 class UserService{
+
 /**
  * Function to send request at backend for number of donations
  * @param {String} url
  * @returns {Number} the number of donations made by a user
  */
-async getDonations(url) {
+async getDonations(id) {
+  const url = `${userServiceUrl}/donations/${id}`;
   const response = await axios.get(url, {
     params: {
       token: Cookies.get('token')
@@ -28,7 +33,7 @@ async getDonations(url) {
  * @returns {Promise<{users,usersCount}>}
  */
 async getUsers(page,limit,search) {
-  const url = `${process.env.REACT_APP_API_URL}/users/getUsers`;
+  const url = `${userServiceUrl}/getUsers`;
   return ( await axios.post(url,{
     page: page, limit: limit, 
     searchQuery: search,
@@ -38,7 +43,7 @@ async getUsers(page,limit,search) {
 
 // Fetch donations done by the user
 async fetchDonations(userId){
-  const url = `${process.env.REACT_APP_API_URL}/users/donations/${userId}`;
+  const url = `${userServiceUrl}/donations/${userId}`;
   return await axios.get(url,{
     params: {
       token: Cookies.get('token')
@@ -48,7 +53,7 @@ async fetchDonations(userId){
 
 // Fetch donations done by the user
 async fetchOrders(userId){
-  const url = `${process.env.REACT_APP_API_URL}/users/orders/${userId}`;
+  const url = `${orderServiceUrl}/getOrder/${userId}`;
   return await axios.get(url, {
     params: {
       token: Cookies.get('token')
@@ -58,7 +63,7 @@ async fetchOrders(userId){
 
 // Fetch donations done by the user
 async fetchAllOrders(filters){
-  const url = `${process.env.REACT_APP_API_URL}/admin/orders/getOrders`;
+  const url = `${orderServiceUrl}/admin/getOrders`;
   return await axios.get(url, {
     params: {
       token: Cookies.get('token'),
@@ -74,7 +79,7 @@ async fetchAllOrders(filters){
  * @returns
  */
 async loginUser (email, password) {
-  let res = await axios.post(`${process.env.REACT_APP_API_URL}/login`, {email, password});
+  let res = await axios.post(`${userServiceUrl}/login`, {email, password});
   return res;
 };
 
@@ -88,7 +93,7 @@ async loginUser (email, password) {
 async registerUser (name, username, email, password) {
   try {
     const response = await axios
-      .post(`${process.env.REACT_APP_API_URL}/register`, {
+      .post(`${process.env.REACT_APP_USER_MS_URL}/register`, {
         name: name,
         email: email,
         username: username,
@@ -106,7 +111,8 @@ async registerUser (name, username, email, password) {
    * @param {String} url 
    * @returns response from backend after fetching user details
   */
-async getUser (url){
+async getUser (id){
+  const url = `${userServiceUrl}/${id}`;
   const result = await axios.get(url,{
     params: 
     {
@@ -123,7 +129,7 @@ async getUser (url){
 async postGoogleUser (userObj) {
   try {
     let res = await axios
-    .post(`${process.env.REACT_APP_API_URL}/registerGoogleUser`, userObj);
+    .post(`${process.env.REACT_APP_USER_MS_URL}/registerGoogleUser`, userObj);
     return res;
   } catch (error) {
     console.log(error);
@@ -139,7 +145,7 @@ async postGoogleUser (userObj) {
 async getUserProfile(id) {
   try {
     return await axios
-    .get(`${process.env.REACT_APP_API_URL}/users/${id}`,{
+    .get(`${userServiceUrl}/${id}`,{
       params: {
         token: Cookies.get('token')
       }
@@ -157,7 +163,7 @@ async getUserProfile(id) {
 */
 async addAddress(address){
   try {
-    let res = await axios.post(`${process.env.REACT_APP_API_URL}/users/addAddress`,{
+    let res = await axios.post(`${userServiceUrl}/addAddress`,{
       address,token: Cookies.get('token'),id: JSON.parse(Cookies.get('userToken'))._id
     });
 
@@ -172,7 +178,7 @@ async addAddress(address){
  * @returns Address of the user
 */
 async getAddress(userId){
-  let response = await axios.get(`${process.env.REACT_APP_API_URL}/users/info/getAddress`,{
+  let response = await axios.get(`${userServiceUrl}/info/getAddress`,{
     params: {
       token: Cookies.get('token'),
       id: userId
@@ -188,7 +194,7 @@ async getAddress(userId){
  * @returns response whether otp has been sent
 */
 async sendOtp(id){
-  let response = await axios.post(`${process.env.REACT_APP_API_URL}/sendOtp`,{id});
+  let response = await axios.post(`${userServiceUrl}/sendOtp`,{id});
   return response;
 }
 
@@ -199,7 +205,7 @@ async sendOtp(id){
  * @returns whether the otp is correct or not
 */
 async verifyOtp(id,code){
-  let response = await axios.post(`${process.env.REACT_APP_API_URL}/verifyOtp`,{id,otp:code});
+  let response = await axios.post(`${userServiceUrl}/verifyOtp`,{id,otp:code});
   return response;
 }
 

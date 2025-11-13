@@ -8,15 +8,15 @@ const router = express.Router();
 // Routes for order
 
 // Gets list of orders of an user
-router.get("/users/orders/:id", tokenMiddleware, OrderController.getUserOrders);
+router.get("/orders/getOrder/:id", tokenMiddleware, OrderController.getUserOrders);
 
 // Adds an order to the order model
-router.post("/users/orders/addOrder", tokenMiddleware, OrderController.addOrder);
+router.post("/orders/addOrder", tokenMiddleware, OrderController.addOrder);
 
 // Gets all the order for admin
-router.get("/admin/orders/getOrders", tokenMiddleware, OrderController.getOrders);
+router.get("/orders/admin/getOrders", tokenMiddleware, OrderController.getOrders);
 
 // Gets all the order for admin
-router.get("/orders/:id", tokenMiddleware, OrderController.getBooksInOrder);
+router.get("/orders/getBooksInOrder/:id", tokenMiddleware, OrderController.getBooksInOrder);
 
 module.exports = router;

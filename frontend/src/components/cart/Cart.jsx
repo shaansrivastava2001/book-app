@@ -47,7 +47,7 @@ const Cart = () => {
   const handleShow = () => setShow(true);
 
 
-  const url = `${process.env.REACT_APP_API_URL}/cart/getCartItems`;
+  const url = `${process.env.REACT_APP_CART_MS_URL}/cart/getCartItems`;
 
   // Calls the function in header component
   const handleCallChildFunction = () => {

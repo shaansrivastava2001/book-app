@@ -25,14 +25,13 @@ const BookDetails = () => {
     compareBook();
     
     (async()=>{
-      const data = await BookService.getBookData(url);
+      const data = await BookService.getBookData(id);
       setBook(data.data.book);
     })();
   }, []);
   
   // Getting the id from url parameters
   const id = location.state.bookId;
-  const url = `${process.env.REACT_APP_API_URL}/${id}`;
   
   /**
    *

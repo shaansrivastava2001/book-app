@@ -2,6 +2,10 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 
+const cartServiceUrl = `${process.env.REACT_APP_CART_MS_URL}/cart`;
+const userServiceUrl = `${process.env.REACT_APP_USER_MS_URL}/users`;
+const bookServiceUrl = `${process.env.REACT_APP_BOOK_MS_URL}/books`;
+
 /**
  * Utility class for handling Cart Services
  */
@@ -40,7 +44,7 @@ class CartService{
  * @returns {Number} count of cart items for an user
  */
   async getCartCount (){
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/cart/getCartCount`,{
+    const response = await axios.post(`${cartServiceUrl}/getCartCount`,{
       userId: JSON.parse(Cookies.get('userToken'))._id,
       token: Cookies.get('token')
     });
@@ -53,7 +57,7 @@ class CartService{
  */
   async addToCart (book)  {
     const res = await axios
-      .post(`${process.env.REACT_APP_API_URL}/cart/addToCart`, {
+      .post(`${cartServiceUrl}/addToCart`, {
         title: book.title,
         price: book.price,
         author: book.author,
@@ -76,7 +80,7 @@ class CartService{
  * @param {ObjectId} id
  */
   async deleteBook (id)  {
-    await axios.delete(`${process.env.REACT_APP_API_URL}/${id}`, {
+    await axios.delete(`${bookServiceUrl}/deleteBook/${id}`, {
       data: {
         token: Cookies.get('token')
       }
@@ -88,7 +92,7 @@ class CartService{
  * Clear cart API called at backend
  */
   async clearCart () {
-    axios.post(`${process.env.REACT_APP_API_URL}/cart/clearCart`, {
+    axios.post(`${cartServiceUrl}/clearCart`, {
       userId: JSON.parse(Cookies.get('userToken'))._id,
       userEmail: JSON.parse(Cookies.get('userToken')).email,
       token: Cookies.get('token')
@@ -102,7 +106,7 @@ class CartService{
  * @param {ObjectId} userId
  */
   async removeItem (itemId, userId) {
-    axios.delete(`${process.env.REACT_APP_API_URL}/cart/${itemId}/${userId}`,{
+    axios.delete(`${cartServiceUrl}/deleteItem/${itemId}/${userId}`,{
       data: {
         token: Cookies.get('token')
       }
@@ -117,7 +121,7 @@ class CartService{
   async checkout (totalPrice) {
     try {
       let user = JSON.parse(Cookies.get('userToken'));
-      await axios.post(`${process.env.REACT_APP_API_URL}/cart/sendEmail`, {
+      await axios.post(`${cartServiceUrl}/sendEmail`, {
         email: user.email,
         userId: user._id,
         totalPrice: totalPrice,
@@ -126,7 +130,7 @@ class CartService{
       });
       let qtyResult;
       qtyResult = await axios.post(
-        `${process.env.REACT_APP_API_URL}/cart/checkout`,
+        `${cartServiceUrl}/checkout`,
         {
           userId: user._id,
           token: Cookies.get('token')
@@ -147,7 +151,7 @@ class CartService{
     try {
       let userId = JSON.parse(Cookies.get('userToken'))._id;
       let result = await axios.post(
-        `${process.env.REACT_APP_API_URL}/cart/updateQuantitiesInCart/${userId}`,
+        `${cartServiceUrl}/updateQuantitiesInCart/${userId}`,
         { token: Cookies.get('token') }
       );
       return result;
@@ -164,7 +168,7 @@ class CartService{
     try {
       let userId = JSON.parse(Cookies.get('userToken'))._id;
       let result = await axios.put(
-        `${process.env.REACT_APP_API_URL}/cart/updateQuantity/${userId}/${itemId}`,
+        `${cartServiceUrl}/updateQuantity/${userId}/${itemId}`,
         { action: "increment", token: Cookies.get('token') }
       );
       return result;
@@ -181,7 +185,7 @@ class CartService{
     try {
       let userId = JSON.parse(Cookies.get('userToken'))._id;
       let result = await axios.put(
-        `${process.env.REACT_APP_API_URL}/cart/updateQuantity/${userId}/${itemId}`,
+        `${cartServiceUrl}/updateQuantity/${userId}/${itemId}`,
         { action: "decrement", token: Cookies.get('token') }
       );
       return result;
@@ -199,7 +203,7 @@ class CartService{
     try {
       let result;
       result = await axios.get(
-        `${process.env.REACT_APP_API_URL}/cart/getQuantities/${
+        `${cartServiceUrl}/getQuantities/${
           JSON.parse(Cookies.get('userToken'))._id
         }/${itemId}/${bookId}`, {
           params: {
@@ -218,7 +222,7 @@ class CartService{
    */
   async addOrder (total_price) {
     const res = await axios
-      .post(`${process.env.REACT_APP_API_URL}/users/orders/addOrder`, {
+      .post(`${userServiceUrl}/orders/addOrder`, {
         name: JSON.parse(Cookies.get('userToken')).name,
         userId: JSON.parse(Cookies.get('userToken'))._id,
         email: JSON.parse(Cookies.get('userToken')).email,

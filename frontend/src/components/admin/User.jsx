@@ -17,11 +17,10 @@ const User = (props) => {
   const navigate = useNavigate();
   
   const {name,username,email,_id} = props.user;
-  const url = `${process.env.REACT_APP_API_URL}/users/getDonations/${_id}`;
   
   useEffect(() => {
     (async ()=>{
-      const donationData =  await UserService.getDonations(url);
+      const donationData =  await UserService.getDonations(_id);
       setDonations(donationData.data.donations);
     })();
   }, []);

@@ -34,7 +34,7 @@ const Order_Details = () => {
 
     // Get books in the order
     const getOrders = async () => {
-        const orders = await OrderService.getBooks(location.state.order._id);
+        const orders = await OrderService.getBooksInOrder(location.state.order._id);
         return orders;
     };
     

@@ -5,31 +5,35 @@ const expressSession = require("express-session");
 const path = require("path");
 const cors = require("cors");
 
-const DbUtil = require("./database/connection");
+/**
+ * createApp - returns an Express app with only the selected route groups mounted.
+ *
+ * @param {Array<string>} modules - optional array of module names to mount: 'users','books','cart','order'.
+ *                                  If omitted, all modules are mounted.
+ */
+function createApp(modules) {
+  const app = express();
 
-// Initializing the express app
-const app = express();
+  app.use(express.json());
+  app.use(cors());
 
-app.use(express.json());
+  // Middleware used for Express session for Google login
+  app.use(
+    expressSession({ secret: process.env.SESSION_SECRET || "secret", resave: false, saveUninitialized: false })
+  );
 
-// Middleware used for secure transmission between backend and frontend
-app.use(cors());
+  const mount = (name, file) => {
+    if (!modules || modules.includes(name)) {
+      app.use("/", require(path.join(__dirname, file)));
+    }
+  };
 
-// Middleware used for Express session for Google login
-app.use(
-  expressSession({ secret: "secret", resave: false, saveUninitialized: false })
-);
+  mount("cart", "routes/cart.route.js");
+  mount("users", "routes/users.route.js");
+  mount("books", "routes/books.route.js");
+  mount("order", "routes/order.route.js");
 
-// Connecting to the database
-DbUtil.connect();
+  return app;
+}
 
-// Middleware for routes
-app.use("/", require(path.join(__dirname, "routes/cart.route.js")));
-app.use("/", require(path.join(__dirname, "routes/users.route.js")));
-app.use("/", require(path.join(__dirname, "routes/books.route.js")));
-app.use("/", require(path.join(__dirname, "routes/order.route.js")));
-
-// Creating the server for backend
-app.listen(process.env.PORT, () => {
-  console.log(`Backend server running on port ${process.env.PORT}`);
-});
+module.exports = { createApp };

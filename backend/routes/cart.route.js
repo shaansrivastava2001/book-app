@@ -23,7 +23,7 @@ router.put("/cart/updateQuantity/:userId/:itemId", tokenMiddleware, CartControll
 router.post("/cart/updateQuantitiesInCart/:userId", tokenMiddleware, CartController.updateQuantitiesInCart);
 
 // Deletes and item from the cart
-router.delete("/cart/:itemId/:userId", tokenMiddleware, CartController.deleteItem);
+router.delete("/cart/deleteItem/:itemId/:userId", tokenMiddleware, CartController.deleteItem);
 
 // Compare the quantity of item in cart and in books model
 router.post("/cart/compareQuantity", tokenMiddleware, CartController.compareQuantity);

@@ -15,17 +15,21 @@ class UsersService {
 
   static async getUsers(skip, limit, searchQuery) {
     try {
-      const users = await UserModel.find(
-      {
+      const users = await UserModel.find({
         $or: [
           { username: { $regex: searchQuery, $options: "i" } },
           { name: { $regex: searchQuery, $options: "i" } },
-        ]
-      }).sort({ _id: -1 }).skip(skip).limit(limit);
+        ],
+      })
+        .sort({ _id: -1 })
+        .skip(skip)
+        .limit(limit);
 
+      console.log(`UsersService.getUsers - success count=${users.length}`);
       return users;
     } catch (error) {
-      console.log(error);
+      console.error(`UsersService.getUsers - error`, error);
+      throw error;
     }
   }
 
@@ -35,17 +39,21 @@ class UsersService {
    * @returns {Integer} count of users
    */
   static async countUsers(searchQuery) {
-    let count;
-    if(searchQuery==""){
-      count = await UserModel.countDocuments();
-    } else {
-      count = await UserModel.countDocuments({
-        $or: [
-                { name: { $regex: searchQuery, $options: "i" } }
-              ]
-    });
+    try {
+      let count;
+      if (searchQuery == "") {
+        count = await UserModel.countDocuments();
+      } else {
+        count = await UserModel.countDocuments({
+          $or: [{ name: { $regex: searchQuery, $options: "i" } }],
+        });
+      }
+      console.log(`UsersService.countUsers - success count=${count}`);
+      return count;
+    } catch (error) {
+      console.error(`UsersService.countUsers - error`, error);
+      throw error;
     }
-    return count;
   }
 
   /**
@@ -54,8 +62,14 @@ class UsersService {
    * @returns {Object} user
    */
   static async findUserByUsername(username) {
-    const user = await UserModel.findOne({ username: username });
-    return user;
+    try {
+      const user = await UserModel.findOne({ username: username });
+      console.log(`UsersService.findUserByUsername - success id=${user?._id}`);
+      return user;
+    } catch (error) {
+      console.error(`UsersService.findUserByUsername - error username='${username}'`, error);
+      throw error;
+    }
   }
 
   /**
@@ -64,8 +78,14 @@ class UsersService {
    * @returns {Object} user
    */
   static async findUserByEmail(email) {
-    const user = await UserModel.findOne({ email });
-    return user;
+    try {
+      const user = await UserModel.findOne({ email });
+      console.log(`UsersService.findUserByEmail - success id=${user?._id}`);
+      return user;
+    } catch (error) {
+      console.error(`UsersService.findUserByEmail - error email='${email}'`, error);
+      throw error;
+    }
   }
 
   /**
@@ -74,17 +94,23 @@ class UsersService {
    * @returns {Object} an object of the added user
    */
   static async registerUser(body) {
-    let saltRounds = 10;
-    let hashedPass = bcrypt.hashSync(body.password, saltRounds);
-    body.password = hashedPass;
-    body.role = "User";
-    if(body.isVerified===undefined){
-      body.isVerified = false
-    }
-    let newUser = new UserModel(body);
+    try {
+      let saltRounds = 10;
+      let hashedPass = bcrypt.hashSync(body.password, saltRounds);
+      body.password = hashedPass;
+      body.role = "User";
+      if (body.isVerified === undefined) {
+        body.isVerified = false;
+      }
+      let newUser = new UserModel(body);
 
-    await newUser.save();
-    return newUser;
+      await newUser.save();
+      console.log(`UsersService.registerUser - success id=${newUser._id}`);
+      return newUser;
+    } catch (error) {
+      console.error(`UsersService.registerUser - error username=${body.username}`, error);
+      throw error;
+    }
   }
 
   /**
@@ -94,15 +120,28 @@ class UsersService {
    * @returns {Boolean} a boolean value if password is right or not
    */
   static verifyUser(enteredPassword, actualPassword) {
-    let verified = bcrypt.compareSync(enteredPassword, actualPassword);
-    return verified;
+    try {
+      const verified = bcrypt.compareSync(enteredPassword, actualPassword);
+      console.log(`UsersService.verifyUser - result=${verified}`);
+      return verified;
+    } catch (error) {
+      console.error(`UsersService.verifyUser - error`, error);
+      throw error;
+    }
   }
 
   static async userVerified(id){
-    const user = await UserModel.findByIdAndUpdate(id, {
-      isVerified: true
-    });
-    user.save();
+    try {
+      const user = await UserModel.findByIdAndUpdate(id, {
+        isVerified: true,
+      });
+      await user.save();
+      console.log(`UsersService.userVerified - success id=${id}`);
+      return user;
+    } catch (error) {
+      console.error(`UsersService.userVerified - error id=${id}`, error);
+      throw error;
+    }
   }
 
   /**
@@ -111,8 +150,14 @@ class UsersService {
    * @returns {Number} a value for the donations
    */
   static async countDonations(id) {
-    const donationsCount = await BookModel.count({ donatedById: id });
-    return donationsCount;
+    try {
+      const donationsCount = await BookModel.count({ donatedById: id });
+      console.log(`UsersService.countDonations - success id=${id} count=${donationsCount}`);
+      return donationsCount;
+    } catch (error) {
+      console.error(`UsersService.countDonations - error id=${id}`, error);
+      throw error;
+    }
   }
 
   /**
@@ -121,8 +166,14 @@ class UsersService {
    * @returns {Object} donations done by the user
    */
   static async getDonations(id) {
-    const donations = await BookModel.find({ donatedById: id });
-    return donations;
+    try {
+      const donations = await BookModel.find({ donatedById: id });
+      console.log(`UsersService.getDonations - success id=${id} count=${donations.length}`);
+      return donations;
+    } catch (error) {
+      console.error(`UsersService.getDonations - error id=${id}`, error);
+      throw error;
+    }
   }
   /**
    * Get details of a user from collection
@@ -130,8 +181,14 @@ class UsersService {
    * @returns
    */
   static async getUser(id) {
-    const user = await UserModel.findOne({ _id: id });
-    return user;
+    try {
+      const user = await UserModel.findOne({ _id: id });
+      console.log(`UsersService.getUser - success id=${id}`);
+      return user;
+    } catch (error) {
+      console.error(`UsersService.getUser - error id=${id}`, error);
+      throw error;
+    }
   }
 
   /**
@@ -140,8 +197,14 @@ class UsersService {
    * @returns a user object
    */
   static async findUserById(id) {
-    let user = await UserModel.findOne({ _id: id });
-    return user;
+    try {
+      let user = await UserModel.findOne({ _id: id });
+      console.log(`UsersService.findUserById - success id=${id}`);
+      return user;
+    } catch (error) {
+      console.error(`UsersService.findUserById - error id=${id}`, error);
+      throw error;
+    }
   }
 
   /**
@@ -151,12 +214,15 @@ class UsersService {
    * @returns {Object} Details of the user
    */
   static async addAddress(address,id){
-    const user = await UserModel.findByIdAndUpdate(id, {
-      address: address
-    });
-
-    user.save();
-    return user;
+    try {
+      const user = await UserModel.findByIdAndUpdate(id, { address: address });
+      await user.save();
+      console.log(`UsersService.addAddress - success id=${id}`);
+      return user;
+    } catch (error) {
+      console.error(`UsersService.addAddress - error id=${id}`, error);
+      throw error;
+    }
   }
 
   /**
@@ -165,8 +231,14 @@ class UsersService {
    * @returns {Object} address of the user
    */
   static async getAddress(id){
-    const user = await UserModel.findOne({_id:id});
-    return user.address;
+    try {
+      const user = await UserModel.findOne({ _id: id });
+      console.log(`UsersService.getAddress - success id=${id}`);
+      return user.address;
+    } catch (error) {
+      console.error(`UsersService.getAddress - error id=${id}`, error);
+      throw error;
+    }
   }
 
   /**
@@ -175,32 +247,38 @@ class UsersService {
    * @returns {Object} the new otp document created in the otp collection
    */
   static async sendOtp(user){
-    const otp = Math.floor(100000 + Math.random() * 900000);
-    const expirationTime = Date.now() + 600000;
+    try {
+      const otp = Math.floor(100000 + Math.random() * 900000);
+      const expirationTime = Date.now() + 600000;
 
-    await OtpModel.deleteMany({userId:user._id});
+      await OtpModel.deleteMany({ userId: user._id });
 
-    const emailObj = {
-      name: user.name,
-      userEmail: user.email,
-      otp,
-      from: `Book App ${process.env.EMAIL}`,
-      subject: "OTP Details for Book App",
-      html: `<p>Dear ${user.name},<br>Your One Time Password (OTP) for verification of your account is: <strong>${otp}.</strong> <br>The OTP will be valid for 10 minutes only. Click on resend otp for a new OTP.<br><br> Regards,<br> Book App</p>`
-    };
+      const emailObj = {
+        name: user.name,
+        userEmail: user.email,
+        otp,
+        from: `Book App ${process.env.EMAIL}`,
+        subject: "OTP Details for Book App",
+        html: `<p>Dear ${user.name},<br>Your One Time Password (OTP) for verification of your account is: <strong>${otp}.</strong> <br>The OTP will be valid for 10 minutes only. Click on resend otp for a new OTP.<br><br> Regards,<br> Book App</p>`,
+      };
 
-    const mailMessage = await CommonEmailService.sendEmail(emailObj);
+      const mailMessage = await CommonEmailService.sendEmail(emailObj);
 
-    const newOtp = new OtpModel({
-      email: user.email,
-      otp,
-      userId: user._id,
-      expirationTime,
-      isVerified: false
-    });
+      const newOtp = new OtpModel({
+        email: user.email,
+        otp,
+        userId: user._id,
+        expirationTime,
+        isVerified: false,
+      });
 
-    await newOtp.save();
-    return newOtp;
+      await newOtp.save();
+      console.log(`UsersService.sendOtp - success userId=${user._id} otp=${otp}`);
+      return newOtp;
+    } catch (error) {
+      console.error(`UsersService.sendOtp - error userId=${user._id}`, error);
+      throw error;
+    }
   }
 
   /**
@@ -210,19 +288,27 @@ class UsersService {
    * @returns {String} whether the otp is verified or not
    */
   static async verifyOtp(id,otp){
-    const userOtp = await OtpModel.findOne({userId:id});
-    const currentTime = Date.now();
-    if(!userOtp || userOtp.expirationTime<currentTime){
-      return 'Invalid or expired OTP';
-    }
+    try {
+      const userOtp = await OtpModel.findOne({ userId: id });
+      const currentTime = Date.now();
+      if (!userOtp || userOtp.expirationTime < currentTime) {
+        console.log(`UsersService.verifyOtp - expired or missing userId=${id}`);
+        return "Invalid or expired OTP";
+      }
 
-    if(userOtp.otp!==otp){
-      return 'Incorrect OTP';
-    }
+      if (userOtp.otp !== otp) {
+        console.log(`UsersService.verifyOtp - incorrect userId=${id}`);
+        return "Incorrect OTP";
+      }
 
-    userOtp.verified = true;
-    await userOtp.save();
-    return 'Correct OTP';
+      userOtp.verified = true;
+      await userOtp.save();
+      console.log(`UsersService.verifyOtp - success userId=${id}`);
+      return "Correct OTP";
+    } catch (error) {
+      console.error(`UsersService.verifyOtp - error userId=${id}`, error);
+      throw error;
+    }
   }
 }
 
