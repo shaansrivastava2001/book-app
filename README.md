@@ -1,63 +1,149 @@
 # Book-App
 
-The book app built using the MERN stack (MongoDB, Express.js, React.js, Node.js) is a comprehensive application that allows users to search for, view, and manage books.
+The book app built using the MERN stack (MongoDB, Express.js, React.js, Node.js) is a comprehensive application that allows users to search for, view, and manage books. The backend is built using a **microservices architecture** with separate services for users, books, cart, and orders.
+
+## Architecture Overview
+
+The application consists of:
+- **Frontend**: React.js SPA running on `http://localhost:3000`
+- **Backend Microservices**: Independent services running on separate ports:
+  - **Users Service**: Handles user authentication and profiles (Port: `USERS_PORT`)
+  - **Books Service**: Manages book listings and details (Port: `BOOKS_PORT`)
+  - **Cart Service**: Manages shopping cart operations (Port: `CART_PORT`)
+  - **Orders Service**: Handles order processing (Port: `ORDERS_PORT`)
+- **Database**: MongoDB for data storage
+
+## Prerequisites
 
 Before you begin, make sure you have the following prerequisites installed on your machine:
 
-Node.js: Install the latest stable version of Node.js from the official website: https://nodejs.org
+- **Node.js**: Install the latest stable version from https://nodejs.org
+- **Git**: Install the latest stable version from https://git-scm.com/downloads
+- **MongoDB**: Set up a MongoDB instance (local or Atlas) from https://cloud.mongodb.com/
 
-Git: Install the latest stable version of Git from the official website: https://git-scm.com/downloads
+## Setup Instructions
 
-Steps for setup of the project:
+### Step 1: Clone the Project
 
-# Step 1: Clone the Project
 1) Open your terminal or command prompt.
-
-2) Change the current working directory to the location where you want to clone the project.
-
-3) Run the following command to clone the project repository:
+2) Change to the directory where you want to clone the project.
+3) Run the following command:
+   ```bash
    git clone https://github.com/shsrivastava754/Book-App.git
+   cd Book-App
+   ```
 
-# Step 2: Set up the Backend (Node.js and Express.js)
-1) Change the current working directory to the project's backend folder by writing following line into the terminal:
-   cd <project_folder>/backend
-   
-2) Install the dependencies by running the following command:
+### Step 2: Set up the Backend Microservices
+
+1) Navigate to the backend folder:
+   ```bash
+   cd backend
+   ```
+
+2) Install dependencies:
+   ```bash
    npm install
+   ```
 
-3) Create a .env file in the backend folder and copy the entire text written in "sample.env" file present in the backend folder. Paste the copied text into the       .env file created. Replace the variables by respective information.
+3) Create a `.env` file in the backend folder and copy the content from `sample.env`:
+   ```bash
+   cp sample.env .env
+   ```
    
-4) Start the backend server by running the following command:
-   npm start
+   Update the `.env` file with your configuration:
+   ```
+   PORT=4000
+   USERS_PORT=4001
+   BOOKS_PORT=4002
+   CART_PORT=4003
+   ORDERS_PORT=4004
+   MONGO_URI=<your_mongodb_uri>
+   EMAIL=<admin_email>
+   PASSWORD=<app_password_from_google>
+   SECRET_KEY=<your_jwt_secret_key>
+   SESSION_SECRET=<your_session_secret>
+   ```
 
-The backend server will start running on the specified port.
+4) Set up the admin user in the database:
+   ```bash
+   npm run setup
+   ```
 
-# Step 3: Set up the Frontend (React.js)
-1) Change the current working directory to the project's frontend folder by writing following line into the terminal:
-   cd <project_folder>/frontend
+5) Start the microservices. You can run them in separate terminals:
+   
+   **Terminal 1 - Users Service:**
+   ```bash
+   node microservices/users-ms.js
+   ```
+   
+   **Terminal 2 - Books Service:**
+   ```bash
+   node microservices/books-ms.js
+   ```
+   
+   **Terminal 3 - Cart Service:**
+   ```bash
+   node microservices/cart-ms.js
+   ```
+   
+   **Terminal 4 - Orders Service:**
+   ```bash
+   node microservices/orders-ms.js
+   ```
 
-2) Install the dependencies by running the following command:
+### Step 3: Set up the Frontend
+
+1) Navigate to the frontend folder:
+   ```bash
+   cd frontend
+   ```
+
+2) Install dependencies:
+   ```bash
    npm install
+   ```
 
-3) Create a .env file in the backend folder and copy the entire text written in "sample.env" file present in the backend folder. Paste the copied text into the       .env file created. Replace the variables by respective information.
-
-4) Start the frontend development server by running the following command:
-   npm start
-
-The frontend server will start running on http://localhost:3000 and connect to the backend server.
-
-# Step 4: Database and User Setup
-1) Create a new database on the Atlas MongoDB page: https://cloud.mongodb.com/
-
-2) Provide the obtained URI of the database to the .env file at backend.
-   Example: MONGO_URI = "mongodb://127.0.0.1:27017/myDatabase"
-
-3) i) Change the current working directory to the project's backend folder by writing following line into the terminal:<br>
-      cd <project_folder>/backend <br>
-   ii) Write following line of code to register the admin user into the database:
-      npm run setup
+3) Create a `.env` file in the frontend folder and copy the content from `sample.env`:
+   ```bash
+   cp sample.env .env
+   ```
    
-# Step 5: Open the Application
-1) Open your web browser and visit http://localhost:3000.
+   Update the `.env` file with your configuration:
+   ```
+   REACT_APP_API_URL=http://localhost:4000
+   REACT_APP_GOOGLE_CLIENT_ID=<your_google_client_id>
+   ```
 
-2) You should see the Book App running successfully.
+4) Start the development server:
+   ```bash
+   npm start
+   ```
+
+   The frontend will run on `http://localhost:3000` and automatically connect to the backend microservices.
+
+### Step 4: Database Setup
+
+1) Create a new database on MongoDB Atlas: https://cloud.mongodb.com/
+
+2) Obtain the MongoDB URI and add it to your backend `.env` file:
+   ```
+   MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database_name>
+   ```
+
+3) Run the setup script to create the admin user (from the backend directory):
+   ```bash
+   npm run setup
+   ```
+
+### Step 5: Access the Application
+
+1) Open your web browser and navigate to `http://localhost:3000`
+
+2) You should see the Book App running successfully with all microservices operational.
+
+## Troubleshooting
+
+- **Environment variables not loading**: Make sure the `.env` file is created correctly without spaces around the `=` sign.
+- **Microservices not connecting**: Ensure all microservices are running on their configured ports.
+- **Database connection issues**: Verify your `MONGO_URI` is correct and your MongoDB instance is accessible.
+- **CORS errors**: Check that the frontend `REACT_APP_API_URL` matches your backend port configuration.
