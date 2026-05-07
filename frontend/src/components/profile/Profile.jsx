@@ -19,10 +19,15 @@ const InfoRow = ({ label, value, action }) => (
   </div>
 );
 
+const formatAddress = (a) => a
+  ? `${a.house}, ${a.locality}, ${a.city}, ${a.state} (${a.pin})`
+  : null;
+
 const Profile = () => {
   const [user, setUser] = useState();
   const [donations, setDonations] = useState(0);
   const [orders, setOrders] = useState(0);
+  const [addresses, setAddresses] = useState([]);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -37,27 +42,22 @@ const Profile = () => {
       setUser(data.message);
       setDonations(data.donationsCount ?? 0);
       setOrders(data.ordersCount ?? 0);
+      // Only the authenticated user can list their own addresses (the
+      // endpoint is JWT-scoped). Skip for other users.
+      if (isMe) {
+        try {
+          const res = await UserService.getAddresses();
+          setAddresses(res.data.addresses || []);
+        } catch (err) {
+          console.warn("getAddresses failed", err);
+        }
+      }
     })();
   }, []);
 
-  const editAddress = () => {
-    navigate(`/editAddress/${me._id}`, {
-      state: {
-        house: user.address?.house || "",
-        city: user.address?.city || "",
-        locality: user.address?.locality || "",
-        state: user.address?.state || "",
-        pin: user.address?.pin || "",
-      },
-    });
-  };
-
+  const addAddress = () => navigate(`/editAddress/${me._id}`);
   const goToDonations = () => navigate(`/users/donations/${user.username}`, { state: { userId: me._id } });
   const goToOrders = () => navigate(`/users/orders/${user.username}`, { state: { userId: me._id } });
-
-  const address = user?.address
-    ? `${user.address.house}, ${user.address.locality}, ${user.address.city}, ${user.address.state} (${user.address.pin})`
-    : null;
 
   return (
     <>
@@ -79,23 +79,34 @@ const Profile = () => {
             <InfoRow label="Name" value={user?.name || "—"} />
             <InfoRow label="Username" value={user?.username || "—"} />
             <InfoRow label="Email" value={user?.email || "—"} />
-            <InfoRow
-              label="Address"
-              value={
-                address
-                  ? <span>{address}</span>
-                  : <span className="info-row__missing">No address provided</span>
-              }
-              action={
-                isMe ? (
-                  <button type="button" className="info-row__action" onClick={editAddress} aria-label="Edit address">
-                    <i className="fa-solid fa-pen-to-square"></i>
-                  </button>
-                ) : null
-              }
-            />
           </div>
         </section>
+
+        {isMe && (
+          <section className="form-card profile-card">
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+              <h3 className="section-title" style={{ marginBottom: 0 }}>Saved addresses</h3>
+              <button type="button" className="btn-link" onClick={addAddress}>
+                <i className="fa-solid fa-plus" style={{ marginRight: 4 }}></i> Add address
+              </button>
+            </div>
+            {addresses.length === 0 ? (
+              <p style={{ color: "#6b7384", fontSize: 14, margin: 0 }}>
+                No addresses saved yet. Add one to speed up checkout.
+              </p>
+            ) : (
+              <div className="profile-info">
+                {addresses.map((a, i) => (
+                  <InfoRow
+                    key={a._id || i}
+                    label={a.label || `Address ${i + 1}`}
+                    value={<span>{formatAddress(a)}</span>}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        )}
 
         <h3 className="section-title">Activity</h3>
         <div className="profile-stats">

@@ -23,8 +23,13 @@ const dbSchema = new mongoose.Schema({
   // Role of the user whether he/she is admin or a normal user
   role: String,
 
-  // Address of the user
+  // Legacy single-address field. Kept for read fallback only — new code should
+  // write to `addresses` (the array below). On read, if `addresses` is empty
+  // but `address` exists, the API returns it as `[address]`.
   address: Object,
+
+  // List of saved shipping addresses. Each entry: { house, locality, city, state, pin, label?, isDefault? }.
+  addresses: { type: [Object], default: [] },
 
   // Whether user is verified or not
   isVerified: Boolean

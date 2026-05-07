@@ -83,19 +83,29 @@ class OrderService {
    */
   static async addOrder(body){
     try {
-      body.status = "Placed";
+      // Honor caller-provided status (e.g. "Failed" for declined payments);
+      // default to "Placed" for the success path.
+      if (!body.status) body.status = "Placed";
+      // Drop client-provided fields we don't trust on this path.
+      delete body.token;
       const newOrder = new OrderModel(body);
 
       await newOrder.save();
 
-      const cartItems = await CartModel.find({ userId: body.userId });
-      // Use for..of to await properly
-      for (const item of cartItems) {
-        // Update the quantity of each book in the books collection
-        await this.addBook(item, newOrder._id);
+      // For failed orders, the cart items were NOT purchased — leave them in
+      // the cart so the user can retry. Skip the PurchasedBooks copy that
+      // exists for receipt/fulfillment of successful orders.
+      const isFailed = body.status === "Failed" || body.paymentStatus === "failed";
+      let itemsCopied = 0;
+      if (!isFailed) {
+        const cartItems = await CartModel.find({ userId: body.userId });
+        for (const item of cartItems) {
+          await this.addBook(item, newOrder._id);
+        }
+        itemsCopied = cartItems.length;
       }
 
-      console.log(`OrderService.addOrder - success orderId=${newOrder._id} items=${cartItems.length}`);
+      console.log(`OrderService.addOrder - success orderId=${newOrder._id} status=${body.status} items=${itemsCopied}`);
       return newOrder;
     } catch (error) {
       console.error(`OrderService.addOrder - error userId=${body.userId}`, error);
@@ -134,6 +144,21 @@ class OrderService {
       return count;
     } catch (error) {
       console.error(`OrderService.countOrders - error`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Fetch a single order by id, plus its purchased books.
+   */
+  static async getOrderById(orderId) {
+    try {
+      const order = await OrderModel.findById(orderId);
+      if (!order) return null;
+      const books = await PurchasedBooksModel.find({ orderId: order._id });
+      return { order, books };
+    } catch (error) {
+      console.error(`OrderService.getOrderById - error id=${orderId}`, error);
       throw error;
     }
   }

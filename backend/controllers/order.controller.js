@@ -64,10 +64,12 @@ class OrderController {
    */
   static async addOrder (req,res){
     try{
-      let quantity = await CartService.countCartItems(req.body.userId);
+      const quantity = await CartService.countCartItems(req.body.userId);
       req.body.quantity = quantity;
-      let newOrder = OrderService.addOrder(req.body);
-      
+      // The Order schema now supports payment metadata (paymentId, paymentMethod,
+      // paymentCardLast4, paymentStatus, paidAt, …); whatever the frontend passes
+      // through after verifyPayment lands here and gets saved on the order doc.
+      const newOrder = await OrderService.addOrder(req.body);
       return res.status(201).json({ newOrder });
     }
     catch (error) {
@@ -105,6 +107,29 @@ class OrderController {
     } catch (error) {
       console.log(error);
       return res.status(500).json({message: "Not able to find books in the order"});
+    }
+  }
+
+  /**
+   * GET /orders/byId/:id — single order detail (owner or admin only).
+   */
+  static async getOrderById(req, res) {
+    try {
+      const result = await OrderService.getOrderById(req.params.id);
+      if (!result) return res.status(404).json({ message: "Order not found" });
+
+      const { order, books } = result;
+      const callerId = req.user?._id?.toString();
+      const ownerId = order.userId?.toString();
+      const isAdmin = ["Admin", "Super Admin"].includes(req.user?.role);
+      if (!isAdmin && callerId !== ownerId) {
+        return res.status(403).json({ message: "Not your order" });
+      }
+
+      return res.status(200).json({ order, books });
+    } catch (error) {
+      console.error("getOrderById - error", error);
+      return res.status(500).json({ message: "Failed to load order" });
     }
   }
 

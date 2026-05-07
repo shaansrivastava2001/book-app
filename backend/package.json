@@ -38,6 +38,7 @@
     "passport": "^0.6.0",
     "passport-google-oauth20": "^2.0.0",
     "perf_hooks": "^0.0.1",
+    "razorpay": "^2.9.6",
     "twilio": "^4.11.1",
     "wbm": "^1.1.16"
   },

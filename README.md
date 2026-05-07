@@ -164,6 +164,56 @@ The frontend uses Google's Identity Services for the "Continue with Google" butt
 
    The "Continue with Google" button on the Login screen should now load. If it doesn't render, double-check that `http://localhost:3000` is listed under **Authorized JavaScript origins** — Google silently refuses to render the button on unauthorized origins.
 
+#### Getting Razorpay Test Keys (for checkout payment)
+
+The cart's checkout flow opens a **Razorpay** modal in test mode — no real money is charged. Test keys (prefixed `rzp_test_…`) only accept Razorpay's test cards.
+
+1) Sign up / log in at https://dashboard.razorpay.com (free, no card or KYC required to use test mode).
+
+2) **Switch the dashboard to TEST MODE** using the toggle at the top-left (next to the Razorpay logo). All keys generated while in Test Mode are test keys.
+
+3) **Generate API keys:**
+   - Sidebar → **Account & Settings → API Keys**.
+   - Click **Generate Test Key**.
+   - Copy both values — `Key ID` (starts with `rzp_test_`) and `Key Secret`. The secret is shown only once; if you lose it, regenerate.
+
+4) Put the keys in your env files:
+
+   In `backend/.env`:
+   ```
+   RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
+   RAZORPAY_KEY_SECRET=<your_test_key_secret>
+   ```
+
+   In `frontend/.env`:
+   ```
+   REACT_APP_RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
+   ```
+   (Same value as the backend's `KEY_ID`. The secret stays backend-only.)
+
+5) Restart the orders microservice (backend reads env at boot) and the frontend dev server.
+
+6) **To pay during testing**, Razorpay test accounts are **domestic-only by default** — the generic Visa `4111 1111 1111 1111` is flagged as international and will be rejected. Use the verified Indian test card below:
+
+   **Test card (recommended):**
+
+   | Field | Value |
+   |---|---|
+   | Card number | `5267 3181 8797 5449` |
+   | Expiry | any future date (e.g. `12/30`) |
+   | CVV | any 3 digits (e.g. `123`) |
+   | Name on card | anything |
+   | OTP | `123456` |
+
+   **Other test methods that work without enabling international payments:**
+
+   - **UPI** — pick "UPI" in the modal and enter UPI ID `success@razorpay` (or `failure@razorpay` to deliberately test the failure flow — the failed order will show up in your Order history with status "Failed" and the failure reason).
+   - **Net banking** — pick any bank in the modal, then click **Success** on the simulator screen.
+
+   Full list of test cards / UPI / netbanking flows: https://razorpay.com/docs/payments/payments/test-card-details/
+
+   If you want to use international test cards too, enable international payments in the dashboard (Settings → Configuration → International), then `4111 1111 1111 1111` works.
+
 ### Step 4: Database Setup
 
 1) Create a new database on MongoDB Atlas: https://cloud.mongodb.com/

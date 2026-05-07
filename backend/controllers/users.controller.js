@@ -247,27 +247,42 @@ class UserController {
    */
   static async addAddress(req, res){
     try {
-      const user = await UserService.addAddress(req.body.address,req.body.id);
-      return res.status(201).json({ user });
+      // Caller's own user id from the verified JWT — never trust body.id.
+      const userId = req.user?._id;
+      if (!userId) return res.status(401).json({ message: "Unauthorized" });
+      const result = await UserService.addAddress(req.body.address, userId);
+      return res.status(201).json({ address: result.address });
     } catch (error) {
-      console.log(error);
-      return res.status(500).json({ message: error });
+      console.error("addAddress - error", error);
+      return res.status(500).json({ message: "Failed to save address" });
     }
   }
 
   /**
-   * Get address of an user
-   * @param {Object} req 
-   * @param {Object} res 
-   * @returns {Object} address of the user
+   * Get the user's first / legacy address (kept for backwards compat).
    */
   static async getAddress(req, res){
     try {
-      const address = await UserService.getAddress(req.query.id);
-      return res.status(201).json({ address });
+      const address = await UserService.getAddress(req.query.id || req.user?._id);
+      return res.status(200).json({ address });
     } catch (error) {
-      console.log(error);
-      return res.status(500).json({ message: error });
+      console.error("getAddress - error", error);
+      return res.status(500).json({ message: "Failed to load address" });
+    }
+  }
+
+  /**
+   * Get all of the user's saved addresses (newest first).
+   */
+  static async getAddresses(req, res){
+    try {
+      const userId = req.user?._id;
+      if (!userId) return res.status(401).json({ message: "Unauthorized" });
+      const addresses = await UserService.getAddresses(userId);
+      return res.status(200).json({ addresses });
+    } catch (error) {
+      console.error("getAddresses - error", error);
+      return res.status(500).json({ message: "Failed to load addresses" });
     }
   }
 

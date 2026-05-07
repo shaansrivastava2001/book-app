@@ -171,6 +171,100 @@ $navbar-bg: $brand-700;
   }
 }
 
+// =============================================================================
+// Cart popover (header dropdown showing items at a glance)
+// =============================================================================
+.cart-popover {
+  width: 320px;
+  max-width: calc(100vw - 32px);
+  padding: 0 !important;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: $space-3 $space-4;
+    border-bottom: 1px solid $color-border;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $color-text;
+  }
+
+  &__count {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    font-weight: $font-weight-medium;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__empty {
+    padding: $space-6 $space-4;
+    text-align: center;
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+  }
+
+  &__list {
+    max-height: 280px;
+    overflow-y: auto;
+    padding: $space-2 0;
+  }
+
+  &__item {
+    padding: $space-2 $space-4;
+    border-bottom: 1px solid $color-surface-alt;
+
+    &:last-child { border-bottom: 0; }
+
+    &-title {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      color: $color-text;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &-meta {
+      font-size: $font-size-xs;
+      color: $color-text-muted;
+      margin-top: 2px;
+    }
+  }
+
+  &__more {
+    text-align: center;
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    padding: $space-2 0;
+  }
+
+  &__total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $space-3 $space-4;
+    border-top: 1px solid $color-border;
+    font-size: $font-size-sm;
+    color: $color-text;
+
+    strong { font-size: $font-size-base; letter-spacing: -0.01em; }
+  }
+
+  &__actions {
+    padding: $space-3 $space-4;
+    border-top: 1px solid $color-border;
+    background: $color-surface-alt;
+    border-bottom-left-radius: $radius-md;
+    border-bottom-right-radius: $radius-md;
+  }
+}
+
+// Bootstrap's Dropdown.Toggle adds a caret pseudo-element by default; kill it
+// for the cart trigger so the cart icon stays clean.
+#cartIcon::after { display: none !important; }
+
 .navDropdown,
 .navDropdown:hover,
 .navDropdown:focus,

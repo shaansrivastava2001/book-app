@@ -169,15 +169,18 @@ async getUserProfile(id) {
  * @returns {Object} Response from the API call at backend
 */
 async addAddress(address){
-  try {
-    let res = await axios.post(`${userServiceUrl}/addAddress`,{
-      address,token: Cookies.get('token'),id: JSON.parse(Cookies.get('userToken'))._id
-    });
+  // Backend reads the caller's user id from the JWT — no need to send it.
+  return axios.post(`${userServiceUrl}/addAddress`, {
+    address,
+    token: Cookies.get('token'),
+  });
+}
 
-    return res;
-  } catch (error) {
-    console.log(error);
-  }
+/** List all saved shipping addresses for the current user. */
+async getAddresses() {
+  return axios.get(`${userServiceUrl}/info/getAddresses`, {
+    params: { token: Cookies.get('token') },
+  });
 }
 
 /**

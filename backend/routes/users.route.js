@@ -34,6 +34,7 @@ router.get("/users/donations/:id", tokenMiddleware, UsersController.getDonations
 
 // Routes for getting and saving the address of the user
 router.get("/users/info/getAddress", tokenMiddleware, UsersController.getAddress);
+router.get("/users/info/getAddresses", tokenMiddleware, UsersController.getAddresses);
 router.post("/users/addAddress", tokenMiddleware, UsersController.addAddress);
 
 // Routes for sending and verifying OTP of the user 

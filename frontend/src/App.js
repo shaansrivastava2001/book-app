@@ -18,6 +18,8 @@ import Requests from "./components/books/Requests";
 import Donations from "./components/profile/Donations";
 import Orders from "./components/profile/Orders";
 import Address from "./components/profile/Address";
+import OrderSuccess from "./components/orders/OrderSuccess";
+import OrderDetail from "./components/orders/OrderDetail";
 
 import PrivateRoutes from "./routes/PrivateRoutes";
 import ProtectLogin from "./routes/ProtectLogin";
@@ -47,6 +49,8 @@ function App() {
           <Route path="/requests" element={<Requests/>} />
           <Route path="/profile/:username" element={<Profile/>} />
           <Route path="/editAddress/:id" element={<Address/>} />
+          <Route path="/order/success/:id" element={<OrderSuccess/>} />
+          <Route path="/order/:id" element={<OrderDetail/>} />
         </Route>
 
         <Route element={<ProfileRoutes/>}>

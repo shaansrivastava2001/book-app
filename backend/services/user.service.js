@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const UserModel = require("../database/schema/user.schema");
 const BookModel = require("../database/schema/book.schema");
 const OtpModel = require("../database/schema/otp.schema");
@@ -239,17 +240,23 @@ class UsersService {
   }
 
   /**
-   * Edits the address of user
-   * @param {Object} address 
-   * @param {String} id 
-   * @returns {Object} Details of the user
+   * Append a new address to the user's `addresses` array. Each address gets
+   * its own ObjectId so the frontend can reference it by id later.
    */
-  static async addAddress(address,id){
+  static async addAddress(address, id) {
     try {
-      const user = await UserModel.findByIdAndUpdate(id, { address: address });
-      await user.save();
+      const newAddress = {
+        _id: new mongoose.Types.ObjectId(),
+        ...address,
+        createdAt: new Date(),
+      };
+      const user = await UserModel.findByIdAndUpdate(
+        id,
+        { $push: { addresses: newAddress } },
+        { new: true }
+      );
       console.log(`UsersService.addAddress - success id=${id}`);
-      return user;
+      return { user, address: newAddress };
     } catch (error) {
       console.error(`UsersService.addAddress - error id=${id}`, error);
       throw error;
@@ -257,19 +264,30 @@ class UsersService {
   }
 
   /**
-   * Returns address of the user
-   * @param {String} id 
-   * @returns {Object} address of the user
+   * Return the user's saved addresses (array). Falls back to the legacy
+   * single-`address` field if `addresses` is empty so old accounts still work.
    */
-  static async getAddress(id){
+  static async getAddresses(id) {
     try {
       const user = await UserModel.findOne({ _id: id });
-      console.log(`UsersService.getAddress - success id=${id}`);
-      return user.address;
+      if (!user) return [];
+      if (Array.isArray(user.addresses) && user.addresses.length > 0) {
+        return user.addresses;
+      }
+      return user.address ? [user.address] : [];
     } catch (error) {
-      console.error(`UsersService.getAddress - error id=${id}`, error);
+      console.error(`UsersService.getAddresses - error id=${id}`, error);
       throw error;
     }
+  }
+
+  /**
+   * Backwards-compat: returns the FIRST saved address (or the legacy single
+   * one). Existing callers that expected `getAddress` keep working.
+   */
+  static async getAddress(id) {
+    const list = await this.getAddresses(id);
+    return list[0] || null;
   }
 
   /**

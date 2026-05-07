@@ -218,24 +218,21 @@ class CartService{
   };
 
   /**
-   * Adds order to the backend database
-   * @param {Integer} total_price 
+   * Adds order to the backend database. Pass `payment` (the metadata returned
+   * by /orders/payment/verify after a successful Razorpay payment) so that
+   * paymentId, method, last4, status, and paidAt are stored on the order doc.
    */
-  async addOrder (total_price) {
+  async addOrder (total_price, payment = {}, shippingAddress = null) {
     const user = JSON.parse(Cookies.get('userToken'));
-    const res = await axios.post(`${orderServiceUrl}/addOrder`, {
+    return axios.post(`${orderServiceUrl}/addOrder`, {
       name: user.name,
       userId: user._id,
       email: user.email,
-      total_price: total_price,
+      total_price,
       token: Cookies.get('token'),
+      shippingAddress,
+      ...payment,
     });
-
-    if (res) {
-      console.log("Order added to backend");
-    } else {
-      console.log("Order adding failed");
-    }
   }
 
 };
