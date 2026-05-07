@@ -1,9 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import "../../styles/style.scss";
 
 import CartService from "../../services/cart.service";
+import { getUser } from "../../utils/auth";
 
 import Header from "../common/Header";
 import CartItem from "./CartItem";
@@ -42,10 +45,34 @@ const Cart = () => {
 
   const checkout = async () => {
     setLoading(true);
-    await CartService.checkout(totalPrice);
-    setLoading(false);
-    await CartService.addOrder(totalPrice);
-    CartService.clearCart();
+    try {
+      // 1. Sends confirmation email + decrements book quantities in stock
+      await CartService.checkout(totalPrice);
+      // 2. Creates the order record
+      await CartService.addOrder(totalPrice);
+      // 3. Empties the cart on the backend
+      await CartService.clearCart();
+
+      // Reflect the cleared cart locally — without this the UI still shows
+      // the old rows even though the backend has been emptied.
+      setItems([]);
+      setTotalPrice(0);
+      handleCallChildFunction(); // refresh the navbar cart badge
+      handleClose();             // close the confirmation modal
+      toast.success("Order placed successfully");
+
+      // Send the user to their orders page so they can see what they just bought.
+      const me = getUser();
+      if (me?.username) {
+        setTimeout(() => navigate(`/users/orders/${me.username}`, { state: { userId: me._id } }), 600);
+      }
+    } catch (err) {
+      console.error("checkout failed", err);
+      const msg = err?.response?.data?.message || "Checkout failed. Please try again.";
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleUpdateQuantity = (price) => setTotalPrice(totalPrice + price);
@@ -162,6 +189,7 @@ const Cart = () => {
           </Modal.Footer>
         </Modal>
       )}
+      <ToastContainer />
     </>
   );
 };

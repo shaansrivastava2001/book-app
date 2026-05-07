@@ -141,7 +141,7 @@ async getUser (id){
  * @param {Object} userObj
 */
 async postGoogleUser (userObj) {
-  return axios.post(`${process.env.REACT_APP_USER_MS_URL}/registerGoogleUser`, userObj);
+  return axios.post(`${userServiceUrl}/registerGoogleUser`, userObj);
 };
 
 /**

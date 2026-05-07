@@ -127,6 +127,43 @@ Before you begin, make sure you have the following prerequisites installed on yo
 
    The frontend will run on `http://localhost:3000` and automatically connect to the backend microservices.
 
+#### Getting a Google OAuth Client ID (for "Sign in with Google")
+
+The frontend uses Google's Identity Services for the "Continue with Google" button. You'll need a free OAuth 2.0 Client ID from Google Cloud Console — only the **Client ID** is required on the frontend; the **Client Secret** must NOT be placed in `frontend/.env` (anything in there is bundled into the JS that ships to every browser).
+
+1) Open the credentials page: https://console.cloud.google.com/apis/credentials
+   Sign in with the Google account you want to own this OAuth app.
+
+2) **Create or select a project** at the top of the page (the project dropdown next to the Google Cloud logo). For a new project, click **New Project**, name it (e.g. `book-app`), and switch to it once it's created.
+
+3) **Configure the OAuth consent screen** (required before creating credentials):
+   - Left sidebar → **APIs & Services → OAuth consent screen**.
+   - Pick **External** user type (unless you're on Google Workspace).
+   - Fill in the required fields: app name (`Book Donation App`), user support email, and developer contact email. The rest can stay blank for development.
+   - On the **Scopes** step, leave defaults — `openid`, `profile`, `email` are added automatically.
+   - On the **Test users** step, add your own Google account (the app stays in "Testing" mode until you publish it; only listed test users can sign in).
+   - Save and exit.
+
+4) **Create the OAuth Client ID:**
+   - Back to **APIs & Services → Credentials**.
+   - Click **+ Create Credentials → OAuth client ID**.
+   - Application type: **Web application**.
+   - Name: anything (e.g. `book-app-web`).
+   - Under **Authorized JavaScript origins**, click **+ Add URI** and enter `http://localhost:3000` (this is the frontend dev server). For production, add the deployed origin too (e.g. `https://book.example.com`).
+   - You can leave **Authorized redirect URIs** empty — the Google Identity Services credential popup flow doesn't redirect.
+   - Click **Create**.
+
+5) Copy the **Client ID** from the dialog (it ends with `.apps.googleusercontent.com`). Ignore the Client Secret — the frontend doesn't need it.
+
+6) Paste the Client ID into `frontend/.env`:
+   ```
+   REACT_APP_GOOGLE_CLIENT_ID=<paste your Client ID here>
+   ```
+
+7) **Restart `npm start`.** Create-React-App only reads `.env` at boot, so a hard reload isn't enough.
+
+   The "Continue with Google" button on the Login screen should now load. If it doesn't render, double-check that `http://localhost:3000` is listed under **Authorized JavaScript origins** — Google silently refuses to render the button on unauthorized origins.
+
 ### Step 4: Database Setup
 
 1) Create a new database on MongoDB Atlas: https://cloud.mongodb.com/
