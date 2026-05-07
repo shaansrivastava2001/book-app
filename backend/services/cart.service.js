@@ -338,7 +338,7 @@ class CartService {
         }
       });
 
-      const userSubject = "Your Purchase on the Book App";
+      const userSubject = "Your Purchase on the Pagevine";
       const adminSubject = "Someone made a purchase";
 
       let result;
@@ -372,7 +372,7 @@ class CartService {
 
     <body>
       <h3 class="header">
-          Book App
+          Pagevine
       </h3>
       <div class="container">
           <h3>
@@ -399,11 +399,11 @@ class CartService {
           </table>
           <p>Thank you for the purchase. You will receive a payment link shortly.</p>
           <p class="mb-0">Yours Truly,</p>
-          <p>Book App</p>
+          <p>Pagevine</p>
       </div>
       <footer class="footer">
           <div class="container">
-              <span class="text-muted">© 2023 Book App. All rights reserved.</span>
+              <span class="text-muted">© 2023 Pagevine. All rights reserved.</span>
           </div>
       </footer>
     </body>`;
@@ -412,7 +412,7 @@ class CartService {
         userEmail: userEmail,
         subject: userSubject,
         html: userEmailTemplate,
-        name: "Book App",
+        name: "Pagevine",
       };
 
       result = await EmailService.sendEmail(userEmailObj);
@@ -427,7 +427,7 @@ class CartService {
 
     <body>
         <h3 class="header">
-            Book App
+            Pagevine
         </h3>
         <div class="container">
             <h3>
@@ -454,11 +454,11 @@ class CartService {
             </table>
             <p>Purchase Successful</p>
             <p class="mb-0">Yours Truly,</p>
-            <p>Book App</p>
+            <p>Pagevine</p>
         </div>
         <footer class="footer">
             <div class="container">
-                <span class="text-muted">© 2023 Book App. All rights reserved.</span>
+                <span class="text-muted">© 2023 Pagevine. All rights reserved.</span>
             </div>
         </footer>
     </body>`;

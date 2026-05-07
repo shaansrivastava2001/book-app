@@ -338,7 +338,7 @@ class BookService {
 
     <body>
       <h3 class="header">
-          Book App
+          Pagevine
       </h3>
       <div class="container">
           <h3>
@@ -360,11 +360,11 @@ class BookService {
           </table>
           
           <p class="mb-0">Yours Truly,</p>
-          <p>Book App</p>
+          <p>Pagevine</p>
       </div>
       <footer class="footer">
           <div class="container">
-              <span class="text-muted">© 2023 Book App. All rights reserved.</span>
+              <span class="text-muted">© 2023 Pagevine. All rights reserved.</span>
           </div>
       </footer>
     </body>`;

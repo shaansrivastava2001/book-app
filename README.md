@@ -1,6 +1,6 @@
-# Book-App
+# Pagevine
 
-The book app built using the MERN stack (MongoDB, Express.js, React.js, Node.js) is a comprehensive application that allows users to search for, view, and manage books. The backend is built using a **microservices architecture** with separate services for users, books, cart, and orders.
+Pagevine is a community library built with the MERN stack (MongoDB, Express.js, React.js, Node.js) — neighbors donate the books they've finished, request the ones they want next, and pay for orders through Razorpay (test mode). The backend uses a **microservices architecture** with separate services for users, books, cart, and orders.
 
 ## Architecture Overview
 
@@ -139,7 +139,7 @@ The frontend uses Google's Identity Services for the "Continue with Google" butt
 3) **Configure the OAuth consent screen** (required before creating credentials):
    - Left sidebar → **APIs & Services → OAuth consent screen**.
    - Pick **External** user type (unless you're on Google Workspace).
-   - Fill in the required fields: app name (`Book Donation App`), user support email, and developer contact email. The rest can stay blank for development.
+   - Fill in the required fields: app name (`Pagevine`), user support email, and developer contact email. The rest can stay blank for development.
    - On the **Scopes** step, leave defaults — `openid`, `profile`, `email` are added automatically.
    - On the **Test users** step, add your own Google account (the app stays in "Testing" mode until you publish it; only listed test users can sign in).
    - Save and exit.
@@ -232,7 +232,7 @@ The cart's checkout flow opens a **Razorpay** modal in test mode — no real mon
 
 1) Open your web browser and navigate to `http://localhost:3000`
 
-2) You should see the Book App running successfully with all microservices operational.
+2) You should see Pagevine running successfully with all microservices operational.
 
 ## Troubleshooting
 

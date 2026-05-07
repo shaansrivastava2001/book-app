@@ -205,7 +205,7 @@ const Cart = () => {
         amount,
         currency,
         order_id: orderId,
-        name: "Book Donation App",
+        name: "Pagevine",
         description: "Cart checkout",
         prefill: {
           name: me?.name || me?.username || "",

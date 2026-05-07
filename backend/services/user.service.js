@@ -306,9 +306,9 @@ class UsersService {
         name: user.name,
         userEmail: user.email,
         otp,
-        from: `Book App ${process.env.EMAIL}`,
-        subject: "OTP Details for Book App",
-        html: `<p>Dear ${user.name},<br>Your One Time Password (OTP) for verification of your account is: <strong>${otp}.</strong> <br>The OTP will be valid for 10 minutes only. Click on resend otp for a new OTP.<br><br> Regards,<br> Book App</p>`,
+        from: `Pagevine ${process.env.EMAIL}`,
+        subject: "OTP Details for Pagevine",
+        html: `<p>Dear ${user.name},<br>Your One Time Password (OTP) for verification of your account is: <strong>${otp}.</strong> <br>The OTP will be valid for 10 minutes only. Click on resend otp for a new OTP.<br><br> Regards,<br> Pagevine</p>`,
       };
 
       const mailMessage = await CommonEmailService.sendEmail(emailObj);
